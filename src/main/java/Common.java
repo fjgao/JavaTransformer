@@ -2,6 +2,7 @@ import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.DataKey;
 import com.github.javaparser.ast.Node;
+import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.stmt.*;
 
@@ -12,23 +13,22 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 
-@SuppressWarnings({"WeakerAccess", "unused"})
+@SuppressWarnings({ "WeakerAccess", "unused" })
 public final class Common {
 
     static String mRootInputPath = "";
     static String mRootOutputPath = "";
     static String mSavePath = "";
 
-    static final DataKey<Integer> VariableId = new DataKey<Integer>() {
-    };
-    static final DataKey<String> VariableName = new DataKey<String>() {
-    };
+    static final DataKey<Integer> VariableId=new DataKey<Integer>(){};
+    static final DataKey<String> VariableName=new DataKey<String>(){};
 
     static ArrayList<Path> getFilePaths(String rootPath) {
         ArrayList<Path> listOfPaths = new ArrayList<>();
         final FilenameFilter filter = (dir, name) -> dir.isDirectory() && name.toLowerCase().endsWith(".txt");
         File[] listOfFiles = new File(rootPath).listFiles(filter);
-        if (listOfFiles == null) return new ArrayList<>();
+        if (listOfFiles == null)
+            return new ArrayList<>();
         for (File file : listOfFiles) {
             Path codePath = Paths.get(file.getPath());
             listOfPaths.add(codePath);
@@ -40,7 +40,7 @@ public final class Common {
     }
 
     static void setOutputPath(Object obj, File javaFile) {
-        //assume '/transforms' in output path
+        // assume '/transforms' in output path
         Common.mSavePath = Common.mRootOutputPath.replace("/transforms",
                 "/transforms/" + obj.getClass().getSimpleName());
     }
@@ -50,7 +50,8 @@ public final class Common {
         try {
             StaticJavaParser.getConfiguration().setAttributeComments(false);
             String txtCode = new String(Files.readAllBytes(javaFile.toPath()));
-            if (!txtCode.startsWith("class")) txtCode = "class T { \n" + txtCode + "\n}";
+            if (!txtCode.startsWith("class"))
+                txtCode = "class T { \n" + txtCode + "\n}";
             root = StaticJavaParser.parse(txtCode);
         } catch (Exception ex) {
             System.out.println("\n" + "Exception: " + javaFile.getPath());
@@ -112,25 +113,31 @@ public final class Common {
 
     static Boolean checkTransformation(CompilationUnit bRoot, CompilationUnit aRoot,
                                        File javaFile, boolean writeFile) {
-        MethodDeclaration mdBefore = (MethodDeclaration) (bRoot.getChildNodes().get(0)).getChildNodes().get(1);
-        String mdBeforeStr = mdBefore.toString().replaceAll("\\s+", "");
-        MethodDeclaration mdAfter = (MethodDeclaration) (aRoot.getChildNodes().get(0)).getChildNodes().get(1);
-        String mdAfterStr = mdAfter.toString().replaceAll("\\s+", "");
-        if (mdBeforeStr.compareTo(mdAfterStr) == 0) {
-            if (writeFile) {
-                String no_dir = Common.mSavePath + "no_transformation.txt";
-                File targetFile = new File(no_dir);
-                Common.saveErrText(no_dir, javaFile);
+        Node bn = (bRoot.getChildNodes().get(0)).getChildNodes().get(1);
+        Node an = (aRoot.getChildNodes().get(0)).getChildNodes().get(1);
+        if (bn instanceof MethodDeclaration || bn instanceof ClassOrInterfaceDeclaration) {
+           String BeforeStr = bn.toString().replaceAll("\\s+", "");
+           String AfterStr = an.toString().replaceAll("\\s+", "");
+           if (BeforeStr.compareTo(AfterStr) == 0) {
+                if (writeFile) {
+                    String no_dir = Common.mSavePath + "no_transformation.txt";
+                    File targetFile = new File(no_dir);
+                    Common.saveErrText(no_dir, javaFile);
+                }
+                return false;
             }
+            return true;
+        }
+        else{
+            System.out.println("In checkTransformation, node not MethodDeclaration or ClassOrInterfaceDeclaration \n" + bn.toString() + "\n");
             return false;
         }
-        return true;
     }
 
     static void saveTransformation(CompilationUnit aRoot, File javaFile, String place) {
         String output_dir = Common.mSavePath + javaFile.getPath().replaceFirst(Common.mRootInputPath, "");
         output_dir = output_dir.substring(0, output_dir.lastIndexOf(".java")) + "_" + place + ".java";
-        MethodDeclaration mdAfter = (MethodDeclaration) (aRoot.getChildNodes().get(0)).getChildNodes().get(1);
+        Node mdAfter = (aRoot.getChildNodes().get(0)).getChildNodes().get(1);
         Common.writeSourceCode(mdAfter, output_dir);
     }
 
@@ -149,7 +156,7 @@ public final class Common {
         }
     }
 
-    static void writeSourceCode(MethodDeclaration md, String codePath) {
+    static void writeSourceCode(Node md, String codePath) {
         File targetFile = new File(codePath).getParentFile();
         if (targetFile.exists() || targetFile.mkdirs()) {
             try (PrintStream ps = new PrintStream(codePath)) {
@@ -174,7 +181,6 @@ public final class Common {
                 || obj instanceof BooleanExchange
                 || obj instanceof LoopExchange
                 || obj instanceof SwitchToIf
-                || obj instanceof ReorderCondition
-        );
+                || obj instanceof ReorderCondition);
     }
 }
