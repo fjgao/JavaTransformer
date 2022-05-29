@@ -52,7 +52,7 @@ public final class Common {
             String txtCode = new String(Files.readAllBytes(javaFile.toPath()));
        //     if (!txtCode.startsWith("class"))
          //       txtCode = "class T { \n" + txtCode + "\n}";
-        //    System.out.println("txtCode:"+txtCode);
+         //  System.out.println("txtCode:"+txtCode);
             
             root = StaticJavaParser.parse(txtCode);
         } catch (Exception ex) {
@@ -112,13 +112,18 @@ public final class Common {
         }
         return newCom;
     }
-
+   
     static Boolean checkTransformation(CompilationUnit bRoot, CompilationUnit aRoot,
                                        File javaFile, boolean writeFile) {
-        Node bn = (bRoot.getChildNodes().get(0)).getChildNodes().get(1);
-        Node an = (aRoot.getChildNodes().get(0)).getChildNodes().get(1);
+        return true;
+        /*
+        Node bn = (bRoot.getChildNodes().get(0));//.getChildNodes().get(1);
+        Node an = (aRoot.getChildNodes().get(0));//.getChildNodes().get(1);
+       // System.out.println("checkTransformation bn:"+bRoot.toString());
+      //  System.out.println("checkTransformation an:"+an.toString());
         if (bn instanceof MethodDeclaration || bn instanceof ClassOrInterfaceDeclaration) {
            String BeforeStr = bn.toString().replaceAll("\\s+", "");
+          // System.out.println("BeforeStr:"+BeforeStr);
            String AfterStr = an.toString().replaceAll("\\s+", "");
            if (BeforeStr.compareTo(AfterStr) == 0) {
                 if (writeFile) {
@@ -131,15 +136,17 @@ public final class Common {
             return true;
         }
         else{
-            System.out.println("In checkTransformation, node not MethodDeclaration or ClassOrInterfaceDeclaration \n" + bn.toString() + "\n");
+            System.out.println("In checkTransformation, node not MethodDeclaration or ClassOrInterfaceDeclaration \n" + bn.toString() + "\n");      
             return false;
-        }
+        }*/
     }
 
     static void saveTransformation(CompilationUnit aRoot, File javaFile, String place) {
-        String output_dir = Common.mSavePath + javaFile.getPath().replaceFirst(Common.mRootInputPath, "");
-        output_dir = output_dir.substring(0, output_dir.lastIndexOf(".java")) + "_" + place + ".java";
-        Node mdAfter = (aRoot.getChildNodes().get(0)).getChildNodes().get(1);
+        String output_dir = javaFile.getPath();
+        //String output_dir = Common.mSavePath + javaFile.getPath().replaceFirst(Common.mRootInputPath, "");
+        //output_dir = output_dir.substring(0, output_dir.lastIndexOf(".java")) + "_" + place + ".java";
+        System.out.println("output_dir:"+output_dir);
+        Node mdAfter = (aRoot.getChildNodes().get(0));//.getChildNodes().get(1);
         Common.writeSourceCode(mdAfter, output_dir);
     }
 

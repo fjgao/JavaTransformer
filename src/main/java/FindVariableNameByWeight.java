@@ -64,7 +64,7 @@ public class FindVariableNameByWeight extends VoidVisitorAdapter<Object> {
             mVarName2Weight.put(aa.getKey(), aa.getValue());
         } */
         try {
-            FileWriter fwriter = new FileWriter(Common.mRootOutputPath+"/VariableNameByWeight.csv",true);
+            FileWriter fwriter = new FileWriter(Common.mRootOutputPath+"/VariableNameByWeight.csv",false);
             CSVWriter writer = new CSVWriter(fwriter);
             for (Map.Entry<String, Integer> aa : alist) {
                // System.out.println(aa.getKey()+" "+aa.getValue());
