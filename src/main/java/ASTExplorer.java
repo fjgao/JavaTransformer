@@ -37,18 +37,21 @@ public class ASTExplorer implements Callable<Void> {
         //TODO: parallel transformation
         javaFiles.forEach((javaFile) -> {
             try {
-                new VariableRenaming().inspectSourceCode(javaFile);
+                //new FindVariableNameByWeight().print(javaFile);
+                //new VariableRenaming().inspectSourceCode(javaFile);
                 new BooleanExchange().inspectSourceCode(javaFile);
                 new LoopExchange().inspectSourceCode(javaFile);
                 new SwitchToIf().inspectSourceCode(javaFile);
                 new ReorderCondition().inspectSourceCode(javaFile);
                 new PermuteStatement().inspectSourceCode(javaFile);
-                new UnusedStatement().inspectSourceCode(javaFile);
-                new LogStatement().inspectSourceCode(javaFile);
+                //new UnusedStatement().inspectSourceCode(javaFile);
+                //new LogStatement().inspectSourceCode(javaFile);
                 new TryCatch().inspectSourceCode(javaFile);
+                
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
         });
+        new FindVariableNameByWeight().writeFileSortByValue();
     }
 }

@@ -50,8 +50,10 @@ public final class Common {
         try {
             StaticJavaParser.getConfiguration().setAttributeComments(false);
             String txtCode = new String(Files.readAllBytes(javaFile.toPath()));
-            if (!txtCode.startsWith("class"))
-                txtCode = "class T { \n" + txtCode + "\n}";
+       //     if (!txtCode.startsWith("class"))
+         //       txtCode = "class T { \n" + txtCode + "\n}";
+        //    System.out.println("txtCode:"+txtCode);
+            
             root = StaticJavaParser.parse(txtCode);
         } catch (Exception ex) {
             System.out.println("\n" + "Exception: " + javaFile.getPath());
